@@ -34,4 +34,12 @@ class AppServiceProvider extends ServiceProvider
             return null;
         });
     }
-}
+
+public function boot(): void
+    {
+        // Paksa semua link asset, route, dan redirect menggunakan HTTPS
+        if (app()->environment('production') || app()->environment('local')) {
+            URL::forceScheme('https');
+        }
+
+    }
