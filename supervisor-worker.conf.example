@@ -1,0 +1,27 @@
+# ==============================================================================
+# SCHID School Portal - Supervisor Worker & Scheduler Configuration
+# ==============================================================================
+# Place in: /etc/supervisor/conf.d/schid-worker.conf
+# Run: supervisorctl reread && supervisorctl update && supervisorctl start all
+
+[program:schid-queue-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/schid/artisan queue:work database --sleep=3 --tries=3 --max-time=3600 --timeout=90
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+user=www-data
+numprocs=2
+redirect_stderr=true
+stdout_logfile=/var/www/schid/storage/logs/queue_worker.log
+stopwaitsecs=3600
+
+[program:schid-scheduler]
+process_name=%(program_name)s
+command=bash -c 'while [ true ]; do (php /var/www/schid/artisan schedule:run --verbose --no-interaction &); sleep 60; done'
+autostart=true
+autorestart=true
+user=www-data
+redirect_stderr=true
+stdout_logfile=/var/www/schid/storage/logs/scheduler.log

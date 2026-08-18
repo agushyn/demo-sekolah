@@ -1,0 +1,37 @@
+# ==============================================================================
+# SCHID School Portal - Apache 2.4 VirtualHost Production Configuration
+# ==============================================================================
+
+<VirtualHost *:80>
+    ServerName sekolah.sch.id
+    ServerAlias www.sekolah.sch.id
+    Redirect permanent / https://sekolah.sch.id/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName sekolah.sch.id
+    ServerAlias www.sekolah.sch.id
+
+    # Document Root MUST point to Laravel's /public directory
+    DocumentRoot "/var/www/schid/public"
+
+    SSLEngine on
+    SSLCertificateFile "/etc/letsencrypt/live/sekolah.sch.id/fullchain.pem"
+    SSLCertificateKeyFile "/etc/letsencrypt/live/sekolah.sch.id/privkey.pem"
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite HIGH:!aNULL:!MD5
+
+    <Directory "/var/www/schid/public">
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Block access to .env and dotfiles
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+
+    ErrorLog ${APACHE_LOG_DIR}/schid_error.log
+    CustomLog ${APACHE_LOG_DIR}/schid_access.log combined
+</VirtualHost>
